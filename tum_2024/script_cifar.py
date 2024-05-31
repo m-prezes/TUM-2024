@@ -56,7 +56,7 @@ EARLY_STOPPING_PATIENCE = 10
 
 for dropout_rate in DROPOUT_RATES:
     set_seed(42)
-    model = Model(INPUT_SIZE, input_channels=3,output_classes=OUTPUT_SIZE, dropout=dropout_rate).to(DEVICE)
+    model = Model( dropout_rate=dropout_rate, input_channels=3,output_size=OUTPUT_SIZE).to(DEVICE)
     optimizer = OPTIMIZER(model.parameters(), lr=LR)
     train_losses, test_losses, test_accuracies = train(
         model,
