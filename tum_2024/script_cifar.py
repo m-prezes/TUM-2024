@@ -11,19 +11,11 @@ RESULTS_DIR = "results"
 
 
 cifar_train_transform = transforms.Compose(
-    [
-
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ]
+    [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
 )
 
 cifar_test_transform = transforms.Compose(
-    [
-
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ]
+    [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
 )
 
 set_seed(42)
@@ -41,7 +33,7 @@ cifar_test_loader = torch.utils.data.DataLoader(
     cifar_test, batch_size=64, shuffle=False
 )
 
-INPUT_SIZE = 128 * 4 * 4
+INPUT_SIZE = 16 * 5 * 5
 OUTPUT_SIZE = len(cifar_train.classes)
 DROPOUT_RATES = [0.0, 0.2, 0.4, 0.6, 0.8]
 
@@ -56,7 +48,12 @@ EARLY_STOPPING_PATIENCE = 10
 
 for dropout_rate in DROPOUT_RATES:
     set_seed(42)
-    model = Model( dropout_rate=dropout_rate, input_channels=3,output_size=OUTPUT_SIZE).to(DEVICE)
+    model = Model(
+        input_size=INPUT_SIZE,
+        dropout_rate=dropout_rate,
+        input_channels=3,
+        output_size=OUTPUT_SIZE,
+    ).to(DEVICE)
     optimizer = OPTIMIZER(model.parameters(), lr=LR)
     train_losses, test_losses, test_accuracies = train(
         model,
@@ -73,5 +70,5 @@ for dropout_rate in DROPOUT_RATES:
         train_losses,
         test_losses,
         test_accuracies,
-        f'{RESULTS_DIR}/cifar/dropout_{dropout_rate}',
+        f"{RESULTS_DIR}/cifar/dropout_{dropout_rate}",
     )

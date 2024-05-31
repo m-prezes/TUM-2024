@@ -40,7 +40,7 @@ mnist_test_loader = torch.utils.data.DataLoader(
     mnist_test, batch_size=64, shuffle=False
 )
 
-INPUT_SIZE = 128 * 3 * 3
+INPUT_SIZE = 256
 OUTPUT_SIZE = len(mnist_train.classes)
 DROPOUT_RATES = [0.0, 0.2, 0.4, 0.6, 0.8]
 
@@ -56,7 +56,12 @@ INPUT_CHANNELS = 1
 print(INPUT_SIZE)
 for dropout_rate in DROPOUT_RATES:
     set_seed(42)
-    model = Model(INPUT_SIZE, INPUT_CHANNELS, OUTPUT_SIZE, dropout_rate).to(DEVICE)
+    model = Model(
+        input_size=INPUT_SIZE,
+        input_channels=INPUT_CHANNELS,
+        output_size=OUTPUT_SIZE,
+        dropout_rate=dropout_rate,
+    ).to(DEVICE)
     optimizer = OPTIMIZER(model.parameters(), lr=LR)
     train_losses, test_losses, test_accuracies = train(
         model,

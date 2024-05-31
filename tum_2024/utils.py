@@ -1,8 +1,9 @@
-from pathlib import Path
 import json
-import torch
 import random
+from pathlib import Path
+
 import numpy as np
+import torch
 
 
 def save_results(model, train_losses, test_losses, test_accuracies, path):

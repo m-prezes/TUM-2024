@@ -15,6 +15,7 @@ def train_step(model, train_loader, criterion, optimizer, device):
         running_loss += loss.item()
     return running_loss / len(train_loader)
 
+
 def evaluate(model, test_loader, criterion, device):
     model.eval()
     running_loss = 0.0
