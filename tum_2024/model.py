@@ -1,25 +1,44 @@
-import torch
 import torch.nn as nn
-
+import torch.nn.functional as F
 
 class Model(nn.Module):
-    def __init__(self, dropout_rate, input_size, hidden_sizes, output_size):
+    def __init__(self, input_size, input_channels, output_classes, dropout):
         super(Model, self).__init__()
-        self.layers = nn.ModuleList()
-        self.dropout = nn.ModuleList()
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.layers.append(nn.Linear(input_size, hidden_sizes[0]))
-        self.dropout.append(nn.Dropout(dropout_rate))
-        for i in range(1, len(hidden_sizes)):
-            self.layers.append(nn.Linear(hidden_sizes[i - 1], hidden_sizes[i]))
-            self.dropout.append(nn.Dropout(dropout_rate))
-        self.layers.append(nn.Linear(hidden_sizes[-1], output_size))
-
+        self.conv1 = nn.Conv2d(in_channels=input_channels, out_channels=32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1)
+        self.dropout1 = nn.Dropout2d(dropout)
+        
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
+        self.conv4 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1)
+        self.dropout2 = nn.Dropout2d(dropout)
+        
+        self.conv5 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1)
+        self.conv6 = nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, padding=1)
+        self.dropout3 = nn.Dropout2d(dropout)
+        
+        self.flatten = nn.Flatten()
+        self.fc = nn.Linear(in_features=input_size, out_features=output_classes)
+    
     def forward(self, x):
-        x = x.view(x.size(0), -1)
-        for layer, dropout in zip(self.layers[:-1], self.dropout):
-            x = layer(x)
-            x = dropout(x)
-            x = torch.relu(x)
-        x = self.layers[-1](x)
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = self.pool(x)
+        x = self.dropout1(x)
+        
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        x = self.pool(x)
+        x = self.dropout2(x)
+        
+        x = F.relu(self.conv5(x))
+        x = F.relu(self.conv6(x))
+        x = self.pool(x)
+        x = self.dropout3(x)
+        
+        x = self.flatten(x)
+        x = self.fc(x)
+        x = F.softmax(x, dim=1)
+        
         return x
